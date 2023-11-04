@@ -73,11 +73,11 @@ app.get('/api/playlists', async (req, res) => {
   const limit = req.query.limit
   const token = req.session.token;
   const playlistUrl = `https://api.spotify.com/v1/me/playlists?offset=${offset}&limit=${limit}`;
-console.log(token)
+
   try {
     const response = await axios.get(playlistUrl, {
       headers: {
-        Authorization: `Bearer ${token}`,
+        Authorization: `Bearer ` + Buffer.from(`${token}`).toString('base64'),
       },
     });
 
@@ -86,7 +86,7 @@ console.log(token)
     res.status(200).json({ playlists });
 
   } catch (error) {
-    res.status(500).json({ message: "Failed to fetch data" + error });
+    res.status(500).json({ message: "Failed to fetch data" + error + ' ' + token });
   }
 });
 
@@ -107,7 +107,7 @@ app.get('/api/start-game', async (req, res) => {
 
     const response = await axios.get(playlist.tracks.href + `?offset=0&limit=${playlist.tracks.total}`, {
       headers: {
-        Authorization: `Bearer ${token}`,
+        Authorization: `Bearer ` + Buffer.from(`${token}`).toString('base64'),
       },
     });
 
@@ -135,7 +135,7 @@ app.get('/api/start-game', async (req, res) => {
       try {
         const response = await axios.get(recomendationsUrl, {
           headers: {
-            Authorization: `Bearer ${token}`,
+            Authorization: `Bearer ` + Buffer.from(`${token}`).toString('base64'),
           },
         });
 
