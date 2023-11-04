@@ -38,6 +38,7 @@ app.get('/auth/spotify', (req, res) => {
 
 app.get('/auth/spotify/callback', async (req, res) => {
   const { code } = req.query;
+  res.status(200).json(code);
   const tokenUrl = 'https://accounts.spotify.com/api/token';
   const authHeader = 'Basic ' + Buffer.from(`${clientId}:${clientSecret}`).toString('base64');
 
@@ -84,7 +85,7 @@ app.get('/api/playlists', async (req, res) => {
   try {
     const response = await axios.get(playlistUrl, {
       headers: {
-        Authorization: `Bearer ` + Buffer.from(`${token}`).toString('base64'),
+        Authorization: `Bearer ` + token,
       },
     });
 
@@ -114,7 +115,7 @@ app.get('/api/start-game', async (req, res) => {
 
     const response = await axios.get(playlist.tracks.href + `?offset=0&limit=${playlist.tracks.total}`, {
       headers: {
-        Authorization: `Bearer ` + Buffer.from(`${token}`).toString('base64'),
+        Authorization: `Bearer ` + token,
       },
     });
 
@@ -142,7 +143,7 @@ app.get('/api/start-game', async (req, res) => {
       try {
         const response = await axios.get(recomendationsUrl, {
           headers: {
-            Authorization: `Bearer ` + Buffer.from(`${token}`).toString('base64'),
+            Authorization: `Bearer ` + token,
           },
         });
 
