@@ -225,6 +225,19 @@ app.get('/get-game', async (req, res) => {
   }
 });
 
+app.get('/', (req, res) => {
+  try {
+    let data = {
+      message: 'This is playlist bingo backend.',
+    };
+    res.status(200).json(data);
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ success: false });
+  }
+  
+});
+
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);
 });
