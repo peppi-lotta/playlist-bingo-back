@@ -2,8 +2,6 @@ const express = require('express')
 const axios = require('axios')
 const dotenv = require('dotenv')
 const session = require('express-session');
-const uuid = require('uuid/v4')
-const FileStore = require('session-file-store')(session);
 const cors = require('cors');
 const Game = require('./games');
 const Bingo = require('./bingos');
@@ -16,12 +14,6 @@ const app = express();
 app.set('trust proxy', 1);
 
 app.use(session({
-  genid: (req) => {
-    console.log('Inside the session middleware')
-    console.log(req.sessionID)
-    return uuid() // use UUIDs for session IDs
-  },
-  store: new FileStore(),
   secret: process.env.SESSION_SECRET_KEY,
   resave: false,
   saveUninitialized: true,
