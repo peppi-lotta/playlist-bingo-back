@@ -73,7 +73,7 @@ app.get('/api/playlists', async (req, res) => {
   const limit = req.query.limit
   const token = req.session.token;
   const playlistUrl = `https://api.spotify.com/v1/me/playlists?offset=${offset}&limit=${limit}`;
-
+console.log(token)
   try {
     const response = await axios.get(playlistUrl, {
       headers: {
