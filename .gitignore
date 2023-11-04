@@ -11,3 +11,4 @@ npm-debug.log
 # Ignore user-specific files
 .DS_Store
 .vscode/
+.vercel

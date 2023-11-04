@@ -6,6 +6,7 @@ const cors = require('cors');
 const Game = require('./games');
 const Bingo = require('./bingos');
 const { generateRandomCode, formGameTracks, formBingoTracks } = require('./helper');
+const { createGamesTable, createBingosTable } = require('./vercel-db')
 
 dotenv.config()
 const app = express();
@@ -191,6 +192,33 @@ app.get('/check-bingo', async (req, res) => {
     };
 
     res.status(200).json(data);
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ success: false });
+  }
+});
+
+app.get('/create-games', async (req, res) => {
+  try {
+    createGamesTable()
+  } catch (error) {
+    console.log(error);
+  }
+});
+
+app.get('/create-bingo', async (req, res) => {
+  try {
+    createBingosTable()
+  } catch (error) {
+    console.log(error);
+  }
+});
+
+app.get('/get-game', async (req, res) => {
+  try {
+    const { code } = req.query;
+    const game = await Game.get(code);
+    res.status(200).json(game);
   } catch (error) {
     console.log(error);
     res.status(500).json({ success: false });

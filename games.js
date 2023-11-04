@@ -44,9 +44,8 @@ class Game {
     async create() {
         const insertQuery = `INSERT INTO ${Game.table} (code, tracks_url, tracks_count, recommendations_url, game_tracks) VALUES ($1, $2, $3, $4, $5) RETURNING *`;
         const values = [this.code, this.tracks_url, this.tracks_count, this.recommendations_url, JSON.stringify(this.game_tracks)];
-
         const [newGame] = await query(insertQuery, values);
-
+        console.log(newGame)
         return new Game(newGame); // Return a new instance
     }
 
