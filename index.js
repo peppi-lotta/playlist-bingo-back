@@ -2,6 +2,8 @@ const express = require('express')
 const axios = require('axios')
 const dotenv = require('dotenv')
 const session = require('express-session');
+const uuid = require('uuid/v4')
+const FileStore = require('session-file-store')(session);
 const cors = require('cors');
 const Game = require('./games');
 const Bingo = require('./bingos');
@@ -11,11 +13,19 @@ const { createGamesTable, createBingosTable } = require('./vercel-db')
 dotenv.config()
 const app = express();
 
+app.set('trust proxy', 1);
+
 app.use(session({
+  genid: (req) => {
+    console.log('Inside the session middleware')
+    console.log(req.sessionID)
+    return uuid() // use UUIDs for session IDs
+  },
+  store: new FileStore(),
   secret: process.env.SESSION_SECRET_KEY,
   resave: false,
-  saveUninitialized: false,
-  cookie: { secure: false, httpOnly: true }
+  saveUninitialized: true,
+  cookie: { secure: false, httpOnly: true },
 }));
 
 app.use(cors({
@@ -74,7 +84,7 @@ app.get('/api/playlists', async (req, res) => {
   const limit = req.query.limit
   const token = req.session.token;
   if (!token) {
-    res.status(401).json({ message: 'Authentication token is missing or invalid', token: token  });
+    res.status(401).json({ message: `Authentication token is missing or invalid... ${token}` });
     return;
   }
   const playlistUrl = `https://api.spotify.com/v1/me/playlists?offset=${offset}&limit=${limit}`;
