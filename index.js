@@ -10,17 +10,18 @@ const { createGamesTable, createBingosTable } = require('./vercel-db')
 
 dotenv.config()
 const app = express();
+
 app.use(session({
   secret: process.env.SESSION_SECRET_KEY,
   resave: false,
-  saveUninitialized: true,
+  saveUninitialized: false,
+  cookie: { secure: false, httpOnly: true }
 }));
-const corsOptions = {
+
+app.use(cors({
   origin: process.env.BASE_URL, // Replace with your React app's domain
   credentials: true,
-};
-
-app.use(cors(corsOptions));
+}));
 
 const port = 5001;
 const redirectUri = process.env.SPOTIFY_REDIRECT_URI;
@@ -72,6 +73,10 @@ app.get('/api/playlists', async (req, res) => {
   }
   const limit = req.query.limit
   const token = req.session.token;
+  if (!token) {
+    res.status(401).json({ message: 'Authentication token is missing or invalid', token: token  });
+    return;
+  }
   const playlistUrl = `https://api.spotify.com/v1/me/playlists?offset=${offset}&limit=${limit}`;
 
   try {
@@ -86,7 +91,7 @@ app.get('/api/playlists', async (req, res) => {
     res.status(200).json({ playlists });
 
   } catch (error) {
-    res.status(500).json({ message: "Failed to fetch data" + error + ' ' + token });
+    res.status(500).json({ message: "Failed to fetch data" + error});
   }
 });
 
