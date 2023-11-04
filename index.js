@@ -34,11 +34,12 @@ app.get('/auth/spotify', (req, res) => {
   const scope = 'user-read-private user-read-email'; // Specify the required scopes
   const authUrl = `https://accounts.spotify.com/authorize?client_id=${clientId}&response_type=code&redirect_uri=${redirectUri}&scope=${encodeURIComponent(scope)}`;
   res.redirect(authUrl);
+  console.log(authUrl)
+
 });
 
 app.get('/auth/spotify/callback', async (req, res) => {
   const { code } = req.query;
-  res.status(200).json(code);
   const tokenUrl = 'https://accounts.spotify.com/api/token';
   const authHeader = 'Basic ' + Buffer.from(`${clientId}:${clientSecret}`).toString('base64');
 
