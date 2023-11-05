@@ -252,6 +252,16 @@ app.get('/get-game', async (req, res) => {
   }
 });
 
+app.get('/test-token', async (req, res) => {
+  try {
+    const token = req.cookies.token;
+    res.status(200).json(token);
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ success: false });
+  }
+});
+
 app.get('/', (req, res) => {
   try {
     let data = {
