@@ -70,7 +70,7 @@ app.get('/auth/spotify/callback', async (req, res) => {
 
       // Store the access token in the user's session
       res.cookie('token', access_token, { secure: true, sameSite: 'none' });
-      res.cookie('playlists', [], { secure: true, sameSite: 'none' });
+      localStorage.setItem('playlists', JSON.stringify([]));
 
       res.redirect(`${process.env.BASE_URL}/host`);
     } else {
@@ -88,7 +88,7 @@ app.get('/api/playlists', async (req, res) => {
   const offset = req.query.offset
   let playlists = []
   if (offset > 0) {
-    playlists = req.cookies.playlists
+    playlists = JSON.parse(localStorage.getItem('playlists'));
   }
   const limit = req.query.limit
   const token = req.cookies.token;
@@ -104,7 +104,7 @@ app.get('/api/playlists', async (req, res) => {
     const data = await response.json();
 
     playlists = playlists.concat(data.items)
-    res.cookie('playlists', playlists, { secure: true, sameSite: 'none' });
+    localStorage.setItem('playlists', JSON.stringify(playlist));
 
     res.status(200).json({ playlists });
 
@@ -117,7 +117,7 @@ app.get('/api/start-game', async (req, res) => {
 
   const token = req.cookies.token;
   const playlist_id = req.query.playlist_id
-  const playlists = req.cookies.playlists
+  const playlists = JSON.parse(localStorage.getItem('playlists'));
   const count = 30;
 
   try {
