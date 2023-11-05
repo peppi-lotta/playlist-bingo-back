@@ -102,11 +102,11 @@ app.get('/api/playlists', async (req, res) => {
     });
 
     const data = await response.json();
-
-    playlists = playlists.concat(data.data.items)
+    res.status(200).json(data);
+/*     playlists = playlists.concat(data.data.items)
     res.cookie('playlists', playlists, { secure: true, sameSite: 'none' });
 
-    res.status(200).json({ playlists });
+    res.status(200).json({ playlists }); */
 
   } catch (error) {
     res.status(500).json({ message: "Failed to fetch data" + error });
