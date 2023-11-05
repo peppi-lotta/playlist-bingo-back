@@ -1,4 +1,5 @@
 const express = require('express')
+const cookieParser = require('cookie-parser')
 const axios = require('axios')
 const dotenv = require('dotenv')
 const session = require('express-session');
@@ -6,10 +7,11 @@ const cors = require('cors');
 const Game = require('./games');
 const Bingo = require('./bingos');
 const { generateRandomCode, formGameTracks, formBingoTracks } = require('./helper');
-const { createGamesTable, createBingosTable } = require('./vercel-db')
+const { createGamesTable, createBingosTable } = require('./vercel-db');
 
 dotenv.config()
 const app = express();
+app.use(cookieParser())
 app.use(session({
   secret: process.env.SESSION_SECRET_KEY,
   resave: false,
