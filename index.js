@@ -102,11 +102,11 @@ app.get('/api/playlists', async (req, res) => {
     });
 
     const data = await response.json();
-    res.status(200).json(data);
-/*     playlists = playlists.concat(data.data.items)
+
+    playlists = playlists.concat(data.items)
     res.cookie('playlists', playlists, { secure: true, sameSite: 'none' });
 
-    res.status(200).json({ playlists }); */
+    res.status(200).json({ playlists });
 
   } catch (error) {
     res.status(500).json({ message: "Failed to fetch data" + error });
@@ -136,7 +136,7 @@ app.get('/api/start-game', async (req, res) => {
 
     const data = await response.json();
 
-    const playlist_tracks = data.data.items;
+    const playlist_tracks = data.items;
     let game_tracks = [];
 
     game_tracks = formGameTracks(game_tracks, playlist_tracks, game.tracks_count, count);
@@ -166,7 +166,7 @@ app.get('/api/start-game', async (req, res) => {
 
         const data = await response.json();
 
-        const recommendation_tracks = data.data.tracks
+        const recommendation_tracks = data.tracks
         game_tracks = formGameTracks(game.game_tracks, recommendation_tracks, recommendation_tracks.length, count)
         game.game_tracks = game_tracks
         game = await game.update()
