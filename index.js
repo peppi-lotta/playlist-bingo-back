@@ -66,7 +66,6 @@ app.get('/auth/spotify/callback', async (req, res) => {
 
     // Store the access token in the user's session
     req.session.token = access_token;
-    res.status(200).json(access_token + ':' + req.session.token);
     req.session.playlists = []
     res.redirect(`${process.env.BASE_URL}/host`);
 
@@ -85,7 +84,8 @@ app.get('/api/playlists', async (req, res) => {
   }
   const limit = req.query.limit
   const token = req.session.token;
-  const playlistUrl = `https://api.spotify.com/v1/me/playlists?offset=${offset}&limit=${limit}`;
+  res.status(200).json(token);
+  /* const playlistUrl = `https://api.spotify.com/v1/me/playlists?offset=${offset}&limit=${limit}`;
 
   try {
     const response = await axios.get(playlistUrl, {
@@ -100,7 +100,7 @@ app.get('/api/playlists', async (req, res) => {
 
   } catch (error) {
     res.status(500).json({ message: "Failed to fetch data" + error });
-  }
+  } */
 });
 
 app.get('/api/start-game', async (req, res) => {
