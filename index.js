@@ -2,6 +2,7 @@ const express = require('express')
 const axios = require('axios')
 const dotenv = require('dotenv')
 const session = require('express-session');
+const cookieParser = require('cookie-parser')
 const cors = require('cors');
 const Game = require('./games');
 const Bingo = require('./bingos');
@@ -10,17 +11,18 @@ const { createGamesTable, createBingosTable } = require('./vercel-db')
 
 dotenv.config()
 const app = express();
+app.use(cookieParser());
+
 app.use(session({
   secret: process.env.SESSION_SECRET_KEY,
   resave: false,
   saveUninitialized: true,
 }));
-const corsOptions = {
+
+app.use(cors({
   origin: process.env.BASE_URL, // Replace with your React app's domain
   credentials: true,
-};
-
-app.use(cors(corsOptions));
+}));
 
 const port = 5001;
 const redirectUri = process.env.SPOTIFY_REDIRECT_URI;
