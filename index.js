@@ -3,6 +3,7 @@ const axios = require('axios')
 const dotenv = require('dotenv')
 const uuid = require('uuid');
 const cookieSession = require('cookie-session');
+const cookieParser = require('cookie-parser');
 const cors = require('cors');
 const Game = require('./games');
 const Bingo = require('./bingos');
@@ -18,6 +19,7 @@ app.use(cookieSession({
   secure: true, // Mark the cookie as secure for HTTPS
   sameSite: 'none', // Set SameSite attribute to 'None'
 }));
+app.use(cookieParser());
 const corsOptions = {
   origin: process.env.BASE_URL, // Replace with your React app's domain
   credentials: true,
@@ -30,7 +32,7 @@ const redirectUri = process.env.SPOTIFY_REDIRECT_URI;
 const clientId = process.env.SPOTIFY_CLIENT_ID;
 const clientSecret = process.env.SPOTIFY_CLIENT_SECRET;
 
-app.get('/auth/spotify', (req, res) => {
+app.get('/auth/spotify', async (req, res) => {
   const scope = 'user-read-private user-read-email'; // Specify the required scopes
   const authUrl = `https://accounts.spotify.com/authorize?client_id=${clientId}&response_type=code&redirect_uri=${redirectUri}&scope=${encodeURIComponent(scope)}`;
   res.redirect(authUrl);
@@ -65,8 +67,9 @@ app.get('/auth/spotify/callback', async (req, res) => {
     res.cookie('connect.sid', sessionID, { secure: true, sameSite: 'none' });
 
     // Store the access token in the user's session
-    req.session.token = access_token;
-    req.session.playlists = []
+    res.cookie('token', access_token, { secure: true, sameSite: 'none' });
+    res.cookie('playlists', [], { secure: true, sameSite: 'none' });
+
     res.redirect(`${process.env.BASE_URL}/host`);
 
   } catch (error) {
@@ -80,14 +83,14 @@ app.get('/api/playlists', async (req, res) => {
   const offset = req.query.offset
   let playlists = []
   if (offset > 0) {
-    playlists = req.session.playlists
+    playlists = req.cookies.playlists
   }
   const limit = req.query.limit
-  const token = req.session.token;
+  const token = req.cookies.token;
   res.status(200).json('token:' + token);
   const playlistUrl = `https://api.spotify.com/v1/me/playlists?offset=${offset}&limit=${limit}`;
 
-/*   try {
+  try {
     const response = await axios.get(playlistUrl, {
       headers: {
         Authorization: `Bearer ${token}`,
@@ -95,19 +98,20 @@ app.get('/api/playlists', async (req, res) => {
     });
 
     playlists = playlists.concat(response.data.items)
-    req.session.playlists = playlists
+    res.cookie('playlists', playlists, { secure: true, sameSite: 'none' });
+
     res.status(200).json({ playlists });
 
   } catch (error) {
     res.status(500).json({ message: "Failed to fetch data" + error });
-  } */
+  }
 });
 
 app.get('/api/start-game', async (req, res) => {
 
-  const token = req.session.token;
+  const token = req.cookies.token;
   const playlist_id = req.query.playlist_id
-  const playlists = req.session.playlists
+  const playlists = req.cookies.playlists
   const count = 30;
 
   try {
