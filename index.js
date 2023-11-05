@@ -1,6 +1,7 @@
 const express = require('express')
 const dotenv = require('dotenv')
 const uuid = require('uuid');
+const helmet = require('helmet');
 const cookieSession = require('cookie-session');
 const cookieParser = require('cookie-parser');
 const cors = require('cors');
@@ -19,12 +20,17 @@ app.use(cookieSession({
   sameSite: 'none', // Set SameSite attribute to 'None'
 }));
 app.use(cookieParser());
-const corsOptions = {
+app.use(helmet.contentSecurityPolicy({
+  directives: {
+    defaultSrc: ["'self'"],
+    scriptSrc: ["'self'"],
+    // Add other directives as needed
+  }
+}));
+app.use(cors({
   origin: process.env.BASE_URL, // Replace with your React app's domain
   credentials: true,
-};
-
-app.use(cors(corsOptions));
+}));
 
 const port = 5001;
 const redirectUri = process.env.SPOTIFY_REDIRECT_URI;
