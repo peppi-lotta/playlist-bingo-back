@@ -1,5 +1,4 @@
 const express = require('express')
-const axios = require('axios')
 const dotenv = require('dotenv')
 const uuid = require('uuid');
 const cookieSession = require('cookie-session');
@@ -38,44 +37,50 @@ app.get('/auth/spotify', async (req, res) => {
   res.redirect(authUrl);
 });
 
-// Inside the /auth/spotify/callback route
 app.get('/auth/spotify/callback', async (req, res) => {
   const { code } = req.query;
   const tokenUrl = 'https://accounts.spotify.com/api/token';
   const authHeader = 'Basic ' + Buffer.from(`${clientId}:${clientSecret}`).toString('base64');
 
   try {
-    const response = await axios.post(
-      tokenUrl,
-      new URLSearchParams({
-        grant_type: 'authorization_code',
-        code,
-        redirect_uri: redirectUri,
-      }),
-      {
-        headers: {
-          Authorization: authHeader,
-        },
-      }
-    );
+    const formData = new URLSearchParams();
+    formData.append('grant_type', 'authorization_code');
+    formData.append('code', code);
+    formData.append('redirect_uri', redirectUri);
 
-    const { access_token } = response.data;
+    const fetchOptions = {
+      method: 'POST',
+      body: formData,
+      headers: {
+        'Authorization': authHeader,
+        'Content-Type': 'application/x-www-form-urlencoded',
+      },
+    };
 
-    const sessionID = uuid.v4();
+    const response = await fetch(tokenUrl, fetchOptions);
 
-    // Set the 'connect.sid' session cookie with SameSite and secure attributes
-    res.cookie('connect.sid', sessionID, { secure: true, sameSite: 'none' });
+    if (response.ok) {
+      const data = await response.json();
+      const { access_token } = data;
 
-    // Store the access token in the user's session
-    res.cookie('token', access_token, { secure: true, sameSite: 'none' });
-    res.cookie('playlists', [], { secure: true, sameSite: 'none' });
+      const sessionID = uuid.v4();
 
-    res.redirect(`${process.env.BASE_URL}/host`);
+      // Set the 'connect.sid' session cookie with SameSite and secure attributes
+      res.cookie('connect.sid', sessionID, { secure: true, sameSite: 'none' });
 
+      // Store the access token in the user's session
+      res.cookie('token', access_token, { secure: true, sameSite: 'none' });
+      res.cookie('playlists', [], { secure: true, sameSite: 'none' });
+
+      res.redirect(`${process.env.BASE_URL}/host`);
+    } else {
+      console.error('Request failed with status:', response.status);
+    }
   } catch (error) {
-    console.log(error)
+    console.error('Fetch error:', error);
   }
 });
+
 
 
 app.get('/api/playlists', async (req, res) => {
@@ -90,13 +95,15 @@ app.get('/api/playlists', async (req, res) => {
   const playlistUrl = `https://api.spotify.com/v1/me/playlists?offset=${offset}&limit=${limit}`;
 
   try {
-    const response = await axios.get(playlistUrl, {
+    const response = await fetch(playlistUrl, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
     });
 
-    playlists = playlists.concat(response.data.items)
+    const data = await response.json();
+
+    playlists = playlists.concat(data.data.items)
     res.cookie('playlists', playlists, { secure: true, sameSite: 'none' });
 
     res.status(200).json({ playlists });
@@ -121,13 +128,15 @@ app.get('/api/start-game', async (req, res) => {
     game.tracks_url = playlist.tracks.href;
     game.tracks_count = playlist.tracks.total;
 
-    const response = await axios.get(playlist.tracks.href + `?offset=0&limit=${playlist.tracks.total}`, {
+    const response = await fetch(playlist.tracks.href + `?offset=0&limit=${playlist.tracks.total}`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
     });
 
-    const playlist_tracks = response.data.items;
+    const data = await response.json();
+
+    const playlist_tracks = data.data.items;
     let game_tracks = [];
 
     game_tracks = formGameTracks(game_tracks, playlist_tracks, game.tracks_count, count);
@@ -149,13 +158,15 @@ app.get('/api/start-game', async (req, res) => {
       game.recommendations_url = recomendationsUrl
 
       try {
-        const response = await axios.get(recomendationsUrl, {
+        const response = await fetch(recomendationsUrl, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
         });
 
-        const recommendation_tracks = response.data.tracks
+        const data = await response.json();
+
+        const recommendation_tracks = data.data.tracks
         game_tracks = formGameTracks(game.game_tracks, recommendation_tracks, recommendation_tracks.length, count)
         game.game_tracks = game_tracks
         game = await game.update()
@@ -251,7 +262,7 @@ app.get('/', (req, res) => {
     console.log(error);
     res.status(500).json({ success: false });
   }
-  
+
 });
 
 app.listen(port, () => {
