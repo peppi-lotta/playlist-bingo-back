@@ -1,8 +1,8 @@
 const express = require('express')
-const cookieParser = require('cookie-parser')
 const axios = require('axios')
 const dotenv = require('dotenv')
-const session = require('express-session');
+const uuid = require('uuid');
+const cookieSession = require('cookie-session');
 const cors = require('cors');
 const Game = require('./games');
 const Bingo = require('./bingos');
@@ -12,10 +12,12 @@ const { createGamesTable, createBingosTable } = require('./vercel-db');
 dotenv.config()
 const app = express();
 app.use(cookieParser())
-app.use(session({
-  secret: process.env.SESSION_SECRET_KEY,
-  resave: false,
-  saveUninitialized: true,
+app.use(cookieSession({
+  name: 'session',
+  keys: [process.env.SESSION_SECRET_KEY],
+  maxAge: 24 * 60 * 60 * 1000, // 24 hours or as per your needs
+  secure: true, // Mark the cookie as secure for HTTPS
+  sameSite: 'none', // Set SameSite attribute to 'None'
 }));
 const corsOptions = {
   origin: process.env.BASE_URL, // Replace with your React app's domain
@@ -35,6 +37,7 @@ app.get('/auth/spotify', (req, res) => {
   res.redirect(authUrl);
 });
 
+// Inside the /auth/spotify/callback route
 app.get('/auth/spotify/callback', async (req, res) => {
   const { code } = req.query;
   const tokenUrl = 'https://accounts.spotify.com/api/token';
@@ -56,6 +59,13 @@ app.get('/auth/spotify/callback', async (req, res) => {
     );
 
     const { access_token } = response.data;
+
+    const sessionID = uuid.v4();
+
+    // Set the 'connect.sid' session cookie with SameSite and secure attributes
+    res.cookie('connect.sid', sessionID, { secure: true, sameSite: 'none' });
+
+    // Store the access token in the user's session
     req.session.token = access_token;
     req.session.playlists = []
     res.redirect(`${process.env.BASE_URL}/host`);
@@ -64,6 +74,7 @@ app.get('/auth/spotify/callback', async (req, res) => {
     console.log(error)
   }
 });
+
 
 app.get('/api/playlists', async (req, res) => {
 
