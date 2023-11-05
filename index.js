@@ -70,7 +70,8 @@ app.get('/auth/spotify/callback', async (req, res) => {
 
       // Store the access token in the user's session
       res.cookie('token', access_token, { secure: true, sameSite: 'none' });
-      localStorage.setItem('playlists', JSON.stringify([]));
+      const playlists = [];
+      localStorage.setItem('playlists', playlists);
 
       res.redirect(`${process.env.BASE_URL}/host`);
     } else {
