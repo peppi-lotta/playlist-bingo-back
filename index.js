@@ -87,7 +87,6 @@ app.get('/api/playlists', async (req, res) => {
   }
   const limit = req.query.limit
   const token = req.cookies.token;
-  res.status(200).json('token:' + token);
   const playlistUrl = `https://api.spotify.com/v1/me/playlists?offset=${offset}&limit=${limit}`;
 
   try {
