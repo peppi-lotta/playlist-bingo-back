@@ -84,9 +84,10 @@ app.get('/api/playlists', async (req, res) => {
   }
   const limit = req.query.limit
   const token = req.session.token;
+  res.status(200).json('token:' + token);
   const playlistUrl = `https://api.spotify.com/v1/me/playlists?offset=${offset}&limit=${limit}`;
 
-  try {
+/*   try {
     const response = await axios.get(playlistUrl, {
       headers: {
         Authorization: `Bearer ${token}`,
@@ -99,7 +100,7 @@ app.get('/api/playlists', async (req, res) => {
 
   } catch (error) {
     res.status(500).json({ message: "Failed to fetch data" + error });
-  }
+  } */
 });
 
 app.get('/api/start-game', async (req, res) => {
