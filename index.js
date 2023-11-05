@@ -70,8 +70,6 @@ app.get('/auth/spotify/callback', async (req, res) => {
 
       // Store the access token in the user's session
       res.cookie('token', access_token, { secure: true, sameSite: 'none' });
-      const playlists = [];
-      localStorage.setItem('playlists', playlists);
 
       res.redirect(`${process.env.BASE_URL}/host`);
     } else {
@@ -87,10 +85,6 @@ app.get('/auth/spotify/callback', async (req, res) => {
 app.get('/api/playlists', async (req, res) => {
 
   const offset = req.query.offset
-  let playlists = []
-  if (offset > 0) {
-    playlists = JSON.parse(localStorage.getItem('playlists'));
-  }
   const limit = req.query.limit
   const token = req.cookies.token;
   const playlistUrl = `https://api.spotify.com/v1/me/playlists?offset=${offset}&limit=${limit}`;
@@ -104,8 +98,7 @@ app.get('/api/playlists', async (req, res) => {
 
     const data = await response.json();
 
-    playlists = playlists.concat(data.items)
-    localStorage.setItem('playlists', JSON.stringify(playlist));
+    const playlists = data.items
 
     res.status(200).json({ playlists });
 
