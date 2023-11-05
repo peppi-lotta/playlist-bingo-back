@@ -254,7 +254,7 @@ app.get('/get-game', async (req, res) => {
 
 app.get('/test-token', async (req, res) => {
   try {
-    const token = req.cookies.token;
+    const {token} = req.cookies.token;
     res.status(200).json(token);
   } catch (error) {
     console.log(error);
