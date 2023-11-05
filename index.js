@@ -11,7 +11,6 @@ const { createGamesTable, createBingosTable } = require('./vercel-db');
 
 dotenv.config()
 const app = express();
-app.use(cookieParser())
 app.use(cookieSession({
   name: 'session',
   keys: [process.env.SESSION_SECRET_KEY],
