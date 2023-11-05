@@ -59,6 +59,8 @@ app.get('/auth/spotify/callback', async (req, res) => {
 
     const { access_token } = response.data;
 
+    res.status(200).json(access_token);
+
     const sessionID = uuid.v4();
 
     // Set the 'connect.sid' session cookie with SameSite and secure attributes
