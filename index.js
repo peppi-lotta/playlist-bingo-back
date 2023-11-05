@@ -10,20 +10,17 @@ const { createGamesTable, createBingosTable } = require('./vercel-db')
 
 dotenv.config()
 const app = express();
-
-app.set('trust proxy', 1);
-
 app.use(session({
   secret: process.env.SESSION_SECRET_KEY,
   resave: false,
   saveUninitialized: true,
-  cookie: { secure: false, httpOnly: true },
 }));
-
-app.use(cors({
+const corsOptions = {
   origin: process.env.BASE_URL, // Replace with your React app's domain
   credentials: true,
-}));
+};
+
+app.use(cors(corsOptions));
 
 const port = 5001;
 const redirectUri = process.env.SPOTIFY_REDIRECT_URI;
@@ -34,8 +31,6 @@ app.get('/auth/spotify', (req, res) => {
   const scope = 'user-read-private user-read-email'; // Specify the required scopes
   const authUrl = `https://accounts.spotify.com/authorize?client_id=${clientId}&response_type=code&redirect_uri=${redirectUri}&scope=${encodeURIComponent(scope)}`;
   res.redirect(authUrl);
-  console.log(authUrl)
-
 });
 
 app.get('/auth/spotify/callback', async (req, res) => {
@@ -77,16 +72,12 @@ app.get('/api/playlists', async (req, res) => {
   }
   const limit = req.query.limit
   const token = req.session.token;
-  if (!token) {
-    res.status(401).json({ message: `Authentication token is missing or invalid... ${token}` });
-    return;
-  }
   const playlistUrl = `https://api.spotify.com/v1/me/playlists?offset=${offset}&limit=${limit}`;
 
   try {
     const response = await axios.get(playlistUrl, {
       headers: {
-        Authorization: `Bearer ` + token,
+        Authorization: `Bearer ${token}`,
       },
     });
 
@@ -95,7 +86,7 @@ app.get('/api/playlists', async (req, res) => {
     res.status(200).json({ playlists });
 
   } catch (error) {
-    res.status(500).json({ message: "Failed to fetch data" + error});
+    res.status(500).json({ message: "Failed to fetch data" + error });
   }
 });
 
@@ -116,7 +107,7 @@ app.get('/api/start-game', async (req, res) => {
 
     const response = await axios.get(playlist.tracks.href + `?offset=0&limit=${playlist.tracks.total}`, {
       headers: {
-        Authorization: `Bearer ` + token,
+        Authorization: `Bearer ${token}`,
       },
     });
 
@@ -144,7 +135,7 @@ app.get('/api/start-game', async (req, res) => {
       try {
         const response = await axios.get(recomendationsUrl, {
           headers: {
-            Authorization: `Bearer ` + token,
+            Authorization: `Bearer ${token}`,
           },
         });
 
