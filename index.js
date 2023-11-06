@@ -109,11 +109,16 @@ app.get('/api/start-game', async (req, res) => {
 
   const token = req.cookies.token;
   const playlist_id = req.query.playlist_id
-  const playlists = JSON.parse(localStorage.getItem('playlists'));
   const count = 30;
 
   try {
-    const playlist = playlists.find(item => item.id === playlist_id);
+
+    const playlistResponse = await fetch(`https://api.spotify.com/v1/playlists/${playlist_id}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    const playlist = await playlistResponse.json();
 
     let game = new Game();
     game.code = generateRandomCode(6, true);
