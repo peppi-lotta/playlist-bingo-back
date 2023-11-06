@@ -37,13 +37,13 @@ const redirectUri = process.env.SPOTIFY_REDIRECT_URI;
 const clientId = process.env.SPOTIFY_CLIENT_ID;
 const clientSecret = process.env.SPOTIFY_CLIENT_SECRET;
 
-app.get('/auth/spotify', async (req, res) => {
+app.get('auth/spotify', async (req, res) => {
   const scope = 'user-read-private user-read-email'; // Specify the required scopes
   const authUrl = `https://accounts.spotify.com/authorize?client_id=${clientId}&response_type=code&redirect_uri=${redirectUri}&scope=${encodeURIComponent(scope)}`;
   res.redirect(authUrl);
 });
 
-app.get('/auth/spotify/callback', async (req, res) => {
+app.get('auth/spotify/callback', async (req, res) => {
   const { code } = req.query;
   const tokenUrl = 'https://accounts.spotify.com/api/token';
   const authHeader = 'Basic ' + Buffer.from(`${clientId}:${clientSecret}`).toString('base64');
@@ -88,7 +88,7 @@ app.get('/auth/spotify/callback', async (req, res) => {
 
 
 
-app.get('/api/playlists', async (req, res) => {
+app.get('api/playlists', async (req, res) => {
 
   const offset = req.query.offset
   const limit = req.query.limit
@@ -113,7 +113,7 @@ app.get('/api/playlists', async (req, res) => {
   }
 });
 
-app.get('/api/start-game', async (req, res) => {
+app.get('api/start-game', async (req, res) => {
 
   const token = req.cookies.token;
   const playlist_id = req.query.playlist_id
@@ -182,7 +182,7 @@ app.get('/api/start-game', async (req, res) => {
   }
 });
 
-app.get('/auth/bingo', async (req, res) => {
+app.get('auth/bingo', async (req, res) => {
   const { code } = req.query;
   const bingo_count = 15;
   const game_count = 30;
@@ -204,7 +204,7 @@ app.get('/auth/bingo', async (req, res) => {
 
 });
 
-app.get('/check-bingo', async (req, res) => {
+app.get('check-bingo', async (req, res) => {
   try {
     const currentTrack = req.query.current_track;
     const gameCode = req.query.game_code;
@@ -225,7 +225,7 @@ app.get('/check-bingo', async (req, res) => {
   }
 });
 
-app.get('/create-games', async (req, res) => {
+app.get('create-games', async (req, res) => {
   try {
     createGamesTable()
   } catch (error) {
@@ -233,7 +233,7 @@ app.get('/create-games', async (req, res) => {
   }
 });
 
-app.get('/create-bingo', async (req, res) => {
+app.get('create-bingo', async (req, res) => {
   try {
     createBingosTable()
   } catch (error) {
@@ -241,7 +241,7 @@ app.get('/create-bingo', async (req, res) => {
   }
 });
 
-app.get('/get-game', async (req, res) => {
+app.get('get-game', async (req, res) => {
   try {
     const { code } = req.query;
     const game = await Game.get(code);
@@ -252,7 +252,7 @@ app.get('/get-game', async (req, res) => {
   }
 });
 
-app.get('/test-token', async (req, res) => {
+app.get('test-token', async (req, res) => {
   try {
     const token = req.cookies.token;
     res.status(200).json({'token': token});
