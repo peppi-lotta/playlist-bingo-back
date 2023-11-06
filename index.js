@@ -125,7 +125,7 @@ app.get('/api/start-game', async (req, res) => {
     game.tracks_url = playlist.tracks.href;
     game.tracks_count = playlist.tracks.total;
 
-    const response = await fetch(playlist.tracks.href + `?offset=0&limit=${playlist.tracks.total}`, {
+    const response = await fetch(playlist.tracks.href, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
