@@ -30,7 +30,7 @@ const clientId = process.env.SPOTIFY_CLIENT_ID;
 const clientSecret = process.env.SPOTIFY_CLIENT_SECRET;
 
 app.get('/auth/spotify', async (req, res) => {
-  const scope = 'user-read-private user-read-email'; // Specify the required scopes
+  const scope = 'user-read-private user-read-email playlist-read-private-scope'; // Specify the required scopes
   const authUrl = `https://accounts.spotify.com/authorize?client_id=${clientId}&response_type=code&redirect_uri=${redirectUri}&scope=${encodeURIComponent(scope)}`;
   res.redirect(authUrl);
 });
