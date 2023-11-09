@@ -180,7 +180,8 @@ app.get('/api/start-game', async (req, res) => {
 });
 
 app.get('/auth/bingo', async (req, res) => {
-  const { code } = req.query;
+  const { code } = req.query.code;
+  const { name_tag } = req.query.name_tag;
   const bingo_count = 15;
   const game_count = 30;
   const game = await Game.get(code);
@@ -188,6 +189,7 @@ app.get('/auth/bingo', async (req, res) => {
 
   bingo.code = generateRandomCode(5);
   bingo.game_code = game.code;
+  bingo.name_tag = name_tag;
   const bingo_tracks = formBingoTracks(game.game_tracks, bingo_count, game_count);
   bingo.bingo_tracks = bingo_tracks;
 

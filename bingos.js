@@ -6,6 +6,7 @@ class Bingo {
     code;
     game_code;
     bingo_tracks;
+    name_tag;
 
     constructor(params) {
         if (params) {
