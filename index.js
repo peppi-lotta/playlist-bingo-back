@@ -180,8 +180,8 @@ app.get('/api/start-game', async (req, res) => {
 });
 
 app.get('/auth/bingo', async (req, res) => {
-  const { code } = req.query.code;
-  const { name_tag } = req.query.name_tag;
+  const code = req.query.code;
+  const name_tag = req.query.name_tag;
   const bingo_count = 15;
   const game_count = 30;
   const game = await Game.get(code);
