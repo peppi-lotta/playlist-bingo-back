@@ -13,6 +13,7 @@ class Bingo {
             this.code = params.code;
             this.game_code = params.game_code;
             this.bingo_tracks = params.bingo_tracks;
+            this.name_tag = params.name_tag;
         }
     }
 
@@ -29,8 +30,8 @@ class Bingo {
     }
 
     async create() {
-        const insertQuery = `INSERT INTO ${Bingo.table} (code, game_code, bingo_tracks) VALUES ($1, $2, $3) RETURNING *`;
-        const values = [this.code, this.game_code, JSON.stringify(this.bingo_tracks)];
+        const insertQuery = `INSERT INTO ${Bingo.table} (code, game_code, name_tag, bingo_tracks) VALUES ($1, $2, $3, $4) RETURNING *`;
+        const values = [this.code, this.game_code, this.name_tag, JSON.stringify(this.bingo_tracks)];
 
         const [newBingo] = await query(insertQuery, values);
         
@@ -42,9 +43,9 @@ class Bingo {
             throw new Error("Cannot update without a code");
         }
 
-        const updateQuery = `UPDATE ${Bingo.table} SET game_code = $2, bingo_tracks = $3 WHERE code = $1 RETURNING *`;
+        const updateQuery = `UPDATE ${Bingo.table} SET game_code = $2, name_tag = $3 bingo_tracks = $4 WHERE code = $1 RETURNING *`;
 
-        const values = [this.code, this.game_code, JSON.stringify(this.bingo_tracks)];
+        const values = [this.code, this.game_code, this.name_tag, JSON.stringify(this.bingo_tracks)];
         const [updatedBingo] = await query(updateQuery, values);
         return new Bingo(updatedBingo); // Return a new instance
     }
