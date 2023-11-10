@@ -45,7 +45,6 @@ class Game {
         const insertQuery = `INSERT INTO ${Game.table} (code, tracks_url, tracks_count, recommendations_url, game_tracks) VALUES ($1, $2, $3, $4, $5) RETURNING *`;
         const values = [this.code, this.tracks_url, this.tracks_count, this.recommendations_url, JSON.stringify(this.game_tracks)];
         const [newGame] = await query(insertQuery, values);
-        console.log(newGame)
         return new Game(newGame); // Return a new instance
     }
 
@@ -66,10 +65,11 @@ class Game {
         const bingo_artist_ids = bingo.bingo_tracks.map((obj) => obj.artist_id);
         const played_game_tracks = this.game_tracks.slice(0, parseInt(currentTrack) + 1)
         const played_tracks_artist_ids = played_game_tracks.map((obj) => obj.artist_id);
+        let isWin = false;
         
         switch (parseInt(win)) {
             case 1:
-                return await hasCommonValues(bingo_artist_ids, played_tracks_artist_ids, 5);
+                isWin = await hasCommonValues(bingo_artist_ids, played_tracks_artist_ids, 5);
 
             case 2:
             case 3:
@@ -82,15 +82,18 @@ class Game {
                         full_rows++;
                     }
                 }
-                return full_rows >= (parseInt(win) === 3 ? 2 : 1);
+                isWin = full_rows >= (parseInt(win) === 3 ? 2 : 1);
 
             case 4:
-                return await hasCommonValues(bingo_artist_ids, played_tracks_artist_ids, 15);
+                isWin = await hasCommonValues(bingo_artist_ids, played_tracks_artist_ids, 15);
 
             default:
                 console.log('No case was found')
         }
-        return false;
+        if (isWin) {
+            bingo.addWin(parseInt(win));
+        }
+        return isWin;
     }
 
 }

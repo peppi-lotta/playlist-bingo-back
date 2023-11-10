@@ -182,6 +182,7 @@ app.get('/api/start-game', async (req, res) => {
 app.get('/auth/bingo', async (req, res) => {
   const code = req.query.code;
   const name_tag = req.query.name_tag;
+  console.log(name_tag)
   const bingo_count = 15;
   const game_count = 30;
   const game = await Game.get(code);
@@ -257,6 +258,21 @@ app.get('/', (req, res) => {
       message: 'This is playlist bingo backend.',
     };
     res.status(200).json(data);
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ success: false });
+  }
+
+});
+
+app.get('/bingo/update-name', async (req, res) => {
+  try {
+    const code = req.query.code;
+    const name_tag = req.query.name_tag;
+    let bingo = await Bingo.get(code);
+    bingo.name_tag = name_tag;
+    bingo = await bingo.update()
+    res.status(200).json(bingo);
   } catch (error) {
     console.log(error);
     res.status(500).json({ success: false });

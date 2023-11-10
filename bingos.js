@@ -7,6 +7,10 @@ class Bingo {
     game_code;
     bingo_tracks;
     name_tag;
+    win1;
+    win2;
+    win3;
+    win4;
 
     constructor(params) {
         if (params) {
@@ -14,6 +18,10 @@ class Bingo {
             this.game_code = params.game_code;
             this.bingo_tracks = params.bingo_tracks;
             this.name_tag = params.name_tag;
+            this.win1 = params.win1;
+            this.win2 = params.win2;
+            this.win3 = params.win3;
+            this.win4 = params.win4;
         }
     }
 
@@ -43,9 +51,21 @@ class Bingo {
             throw new Error("Cannot update without a code");
         }
 
-        const updateQuery = `UPDATE ${Bingo.table} SET game_code = $2, name_tag = $3 bingo_tracks = $4 WHERE code = $1 RETURNING *`;
+        const updateQuery = `UPDATE ${Bingo.table} SET game_code = $2, name_tag = $3, bingo_tracks = $4 WHERE code = $1 RETURNING *`;
 
         const values = [this.code, this.game_code, this.name_tag, JSON.stringify(this.bingo_tracks)];
+        const [updatedBingo] = await query(updateQuery, values);
+        return new Bingo(updatedBingo); // Return a new instance
+    }
+
+    async addWin(count) {
+        if (!this.code) {
+            throw new Error("Cannot update without a code");
+        }
+
+        const updateQuery = `UPDATE ${Bingo.table} SET win${count} = $2 WHERE code = $1 RETURNING *`;
+
+        const values = [this.code, true];
         const [updatedBingo] = await query(updateQuery, values);
         return new Bingo(updatedBingo); // Return a new instance
     }
