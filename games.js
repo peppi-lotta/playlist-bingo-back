@@ -66,11 +66,11 @@ class Game {
         const played_game_tracks = this.game_tracks.slice(0, parseInt(currentTrack) + 1)
         const played_tracks_artist_ids = played_game_tracks.map((obj) => obj.artist_id);
         let isWin = false;
-        
+
         switch (parseInt(win)) {
             case 1:
                 isWin = await hasCommonValues(bingo_artist_ids, played_tracks_artist_ids, 5);
-
+                break;
             case 2:
             case 3:
                 let full_rows = 0;
@@ -83,12 +83,13 @@ class Game {
                     }
                 }
                 isWin = full_rows >= (parseInt(win) === 3 ? 2 : 1);
-
+                break;
             case 4:
                 isWin = await hasCommonValues(bingo_artist_ids, played_tracks_artist_ids, 15);
-
+                break;
             default:
                 console.log('No case was found')
+                break;
         }
         if (isWin) {
             bingo.addWin(parseInt(win));
