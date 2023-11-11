@@ -280,6 +280,20 @@ app.get('/bingo/update-name', async (req, res) => {
 
 });
 
+app.get('/bingo/get-stats', async (req, res) => {
+  try {
+    const start = req.query.start;
+    const end = req.query.end;
+    console.log(`${start}` + `${end}`)
+    const stats = await Bingo.getStats(`${start}`, `${end}`);
+    res.status(200).json(stats);
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ success: false });
+  }
+
+});
+
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);
 });

@@ -42,7 +42,7 @@ class Bingo {
         const values = [this.code, this.game_code, this.name_tag, JSON.stringify(this.bingo_tracks)];
 
         const [newBingo] = await query(insertQuery, values);
-        
+
         return new Bingo(newBingo); // Return a new instance
     }
 
@@ -68,6 +68,30 @@ class Bingo {
         const values = [this.code, true];
         const [updatedBingo] = await query(updateQuery, values);
         return new Bingo(updatedBingo); // Return a new instance
+    }
+
+    static async getStats(start, end) {
+
+        const selectQuery = `
+            SELECT
+            name_tag,
+            SUM(
+            CASE
+                WHEN win1 THEN 10
+                WHEN win2 THEN 20
+                WHEN win3 THEN 30
+                WHEN win4 THEN 40
+                ELSE 0
+            END
+            ) as total_points
+            FROM ${Bingo.table}
+            WHERE name_tag IS NOT NULL AND added BETWEEN $1 AND $2
+            GROUP BY name_tag
+            ORDER BY total_points DESC`;
+
+        const values = [start, end];
+        const selectSums = await query(selectQuery, values);
+        return selectSums;
     }
 }
 
