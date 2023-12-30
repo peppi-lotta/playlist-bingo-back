@@ -76,13 +76,10 @@ class Bingo {
             SELECT
             name_tag,
             SUM(
-            CASE
-                WHEN win1 THEN 10
-                WHEN win2 THEN 20
-                WHEN win3 THEN 30
-                WHEN win4 THEN 40
-                ELSE 0
-            END
+                CASE WHEN win1 THEN 10 ELSE 0 END +
+                CASE WHEN win2 THEN 20 ELSE 0 END +
+                CASE WHEN win3 THEN 30 ELSE 0 END +
+                CASE WHEN win4 THEN 40 ELSE 0 END
             ) as total_points
             FROM ${Bingo.table}
             WHERE name_tag IS NOT NULL AND added BETWEEN $1 AND $2
