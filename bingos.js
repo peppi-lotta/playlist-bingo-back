@@ -82,7 +82,7 @@ class Bingo {
                 CASE WHEN win4 THEN 40 ELSE 0 END
             ) as total_points
             FROM ${Bingo.table}
-            WHERE name_tag IS NOT NULL AND added BETWEEN $1 AND $2
+            WHERE name_tag IS NOT NULL AND name_tag <> '' AND name_tag <> ' ' AND added BETWEEN $1 AND $2
             GROUP BY name_tag
             ORDER BY total_points DESC`;
 
